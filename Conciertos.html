@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Conciertos</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            display: flex;
+            margin-left: 50px;
+        }
+
+        .concert-list,
+        .order-list {
+            width: 25%;
+            padding: 10px;
+            margin-right: 50px;
+        }
+
+        .date-selector,
+        .concerts-by-date {
+            width: 50%;
+            padding: 10px;
+        }
+
+        .concert-card {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .concert-card img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .concert-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .concert-item div {
+            flex: 1;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .title {
+            text-align: center;
+            background-color: #3939d9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .title h1 {
+            margin: 0;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">
+        <h1>Boletos Electrónicos</h1>
+    </div>
+    <div class="container">
+        <!-- Lista de conciertos -->
+        <div class="concert-list">
+            <h3>Conciertos</h3>
+            <ul class="list-group" id="concertList">
+                <li class="list-group-item concert-card">
+                    <img src="Joji2.jpg" alt="Concierto 1">
+                    <div>
+                        <strong>JOJI</strong>
+                        <p>Fecha: 2024-05-27</p>
+                        <p>Precio: $1,000</p>
+                    </div>
+                </li>
+                <li class="list-group-item concert-card">
+                    <img src="LuisMi.jpg" alt="Concierto 2">
+                    <div>
+                        <strong>Luis Miguel</strong>
+                        <p>Fecha: 2024-06-02</p>
+                        <p>Precio: $2,500</p>
+                    </div>
+                </li>
+                <li class="list-group-item concert-card">
+                    <img src="Gorillaz.jpg" alt="Concierto 3">
+                    <div>
+                        <strong>Gorillaz</strong>
+                        <p>Fecha: 2024-06-01</p>
+                        <p>Precio: $1,800</p>
+                    </div>
+                </li>
+                <li class="list-group-item concert-card">
+                    <img src="Foster.jpg" alt="Concierto 4">
+                    <div>
+                        <strong>Foster the People</strong>
+                        <p>Fecha: 2024-06-01</p>
+                        <p>Precio: $1,700</p>
+                    </div>
+                </li>
+                <!-- Añadir más conciertos aquí -->
+            </ul>
+        </div>
+
+        <!-- Selector de fecha y lista de conciertos por fecha -->
+        <div class="date-selector">
+            <h3>Compra de boletos</h3>
+            <h6>Selecciona una fecha</h6>
+            <input type="date" id="concertDate" class="form-control">
+            <h3>Conciertos Disponibles</h3>
+            <ul class="list-group" id="concertsByDate">
+                <!-- Lista de conciertos disponibles por fecha -->
+            </ul>
+        </div>
+
+        <!-- Pedido -->
+        <div class="order-list">
+            <h3>Carro</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Concierto</th>
+                        <th>Fecha</th>
+                        <th>Boletos</th>
+                    </tr>
+                </thead>
+                <tbody id="orderList">
+                    <!-- Lista de conciertos en el pedido -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para formulario de pedido -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Datos del Comprador</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="orderForm">
+                        <div class="form-group">
+                            <label for="buyerName">Nombre</label>
+                            <input type="text" class="form-control" id="buyerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="buyerEmail">Correo</label>
+                            <input type="email" class="form-control" id="buyerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticketQuantity">Boletos</label>
+                            <input type="number" class="form-control" id="ticketQuantity" min="1" required>
+                        </div>
+                        <input type="hidden" id="concertName">
+                        <input type="hidden" id="concertDateHidden">
+                        <input type="hidden" id="editIndex">
+                        <button type="submit" class="btn btn-primary">Añadir al carrito</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allConcerts = [
+            {
+                image: 'Joji2.jpg',
+                name: 'JOJI',
+                date: '2024-05-27',
+                price: '$1,000'
+            },
+            {
+                image: 'LuisMi.jpg',
+                name: 'Luis Miguel',
+                date: '2024-06-02',
+                price: '$2,500'
+            },
+            {
+                image: 'Gorillaz.jpg',
+                name: 'Gorillaz',
+                date: '2024-06-01',
+                price: '$1,800'
+            },
+            {
+                image: 'Foster.jpg',
+                name: 'Foster the People',
+                date: '2024-06-01',
+                price: '$1,700'
+            },
+            // Añadir más conciertos aquí
+        ];
+
+        document.getElementById('concertDate').addEventListener('change', function () {
+            const selectedDate = this.value;
+            const concertsByDate = document.getElementById('concertsByDate');
+
+            // Limpiar lista de conciertos disponibles
+            concertsByDate.innerHTML = '';
+
+            // Filtrar conciertos disponibles para la fecha seleccionada
+            const availableConcerts = allConcerts.filter(concert => concert.date === selectedDate);
+
+            availableConcerts.forEach(concert => {
+                const li = document.createElement('li');
+                li.classList.add('list-group-item', 'concert-card');
+                li.innerHTML = `
+                    <img src="${concert.image}" alt="${concert.name}">
+                    <div>
+                        <strong>${concert.name}</strong>
+                        <p>Fecha: ${concert.date}</p>
+                        <p>Precio: ${concert.price}</p>
+                        <button class="btn btn-primary" onclick="showOrderForm('${concert.name}', '${concert.date}')">Añadir al carrito</button>
+                    </div>
+                `;
+                concertsByDate.appendChild(li);
+            });
+        });
+
+        function showOrderForm(concertName, concertDate) {
+            document.getElementById('concertName').value = concertName;
+            document.getElementById('concertDateHidden').value = concertDate;
+            document.getElementById('editIndex').value = '';
+            $('#orderModal').modal('show');
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const buyerName = document.getElementById('buyerName').value;
+            const buyerEmail = document.getElementById('buyerEmail').value;
+            const ticketQuantity = document.getElementById('ticketQuantity').value;
+            const concertName = document.getElementById('concertName').value;
+            const concertDate = document.getElementById('concertDateHidden').value;
+            const editIndex = document.getElementById('editIndex').value;
+
+            const concert = allConcerts.find(c => c.name === concertName);
+            const ticketPrice = parseFloat(concert.price.replace('$', '').replace(',', ''));
+
+            if (editIndex === '') {
+                addToOrder({ name: concertName, date: concertDate, buyerName, buyerEmail, ticketQuantity, ticketPrice });
+            } else {
+                updateOrder(editIndex, { name: concertName, date: concertDate, buyerName, buyerEmail, ticketQuantity, ticketPrice });
+            }
+
+            $('#orderModal').modal('hide');
+            this.reset();
+        });
+
+        function addToOrder(order) {
+            const orderList = document.getElementById('orderList');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${order.buyerName}</td>
+                <td>${order.buyerEmail}</td>
+                <td>${order.name}<br><small>Precio: $${order.ticketPrice.toFixed(2)}</small></td>
+                <td>${order.date}</td>
+                <td>${order.ticketQuantity}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning ml-2" onclick="editOrder(${orderList.children.length})">Editar</button>
+                    <button class="btn btn-sm btn-danger ml-2" onclick="deleteOrder(this)">Cancelar</button>
+                </td>
+            `;
+
+            orderList.appendChild(row);
+        }
+
+        function editOrder(index) {
+            const orderList = document.getElementById('orderList');
+            const row = orderList.children[index];
+
+            document.getElementById('buyerName').value = row.cells[0].textContent;
+            document.getElementById('buyerEmail').value = row.cells[1].textContent;
+            document.getElementById('ticketQuantity').value = row.cells[4].textContent;
+
+            const concertInfo = row.cells[2].innerHTML.split('<br><small>Precio: $');
+            document.getElementById('concertName').value = concertInfo[0];
+            document.getElementById('concertDateHidden').value = row.cells[3].textContent;
+            document.getElementById('editIndex').value = index;
+            $('#orderModal').modal('show');
+        }
+
+        function updateOrder(index, order) {
+            const orderList = document.getElementById('orderList');
+            const row = orderList.children[index];
+
+            row.cells[0].textContent = order.buyerName;
+            row.cells[1].textContent = order.buyerEmail;
+            row.cells[2].innerHTML = `${order.name}<br><small>Precio: $${order.ticketPrice.toFixed(2)}</small>`;
+            row.cells[3].textContent = order.date;
+            row.cells[4].textContent = order.ticketQuantity;
+        }
+
+        function deleteOrder(button) {
+            const row = button.parentElement.parentElement;
+            row.parentElement.removeChild(row);
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
