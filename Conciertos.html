@@ -68,7 +68,6 @@
         <h1>Boletos Electrónicos</h1>
     </div>
     <div class="container">
-        <!-- Lista de conciertos -->
         <div class="concert-list">
             <h3>Conciertos</h3>
             <ul class="list-group" id="concertList">
@@ -104,22 +103,18 @@
                         <p>Precio: $1,000</p>
                     </div>
                 </li>
-                <!-- Añadir más conciertos aquí -->
             </ul>
         </div>
 
-        <!-- Selector de fecha y lista de conciertos por fecha -->
         <div class="date-selector">
             <h3>Compra de boletos</h3>
             <h6>Selecciona una fecha</h6>
             <input type="date" id="concertDate" class="form-control">
             <h3>Conciertos Disponibles</h3>
             <ul class="list-group" id="concertsByDate">
-                <!-- Lista de conciertos disponibles por fecha -->
             </ul>
         </div>
 
-        <!-- Pedido -->
         <div class="order-list">
             <h3>Carro</h3>
             <table class="table">
@@ -133,13 +128,11 @@
                     </tr>
                 </thead>
                 <tbody id="orderList">
-                    <!-- Lista de conciertos en el pedido -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal para formulario de pedido -->
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -200,17 +193,14 @@
                 date: '2024-06-01',
                 price: '$1,000'
             },
-            // Añadir más conciertos aquí
         ];
 
         document.getElementById('concertDate').addEventListener('change', function () {
             const selectedDate = this.value;
             const concertsByDate = document.getElementById('concertsByDate');
 
-            // Limpiar lista de conciertos disponibles
             concertsByDate.innerHTML = '';
 
-            // Filtrar conciertos disponibles para la fecha seleccionada
             const availableConcerts = allConcerts.filter(concert => concert.date === selectedDate);
 
             availableConcerts.forEach(concert => {
